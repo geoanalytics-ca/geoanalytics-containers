@@ -1,0 +1,11 @@
+ARG ACR_URL=acrname
+ARG BASE_VERSION_TAG
+
+FROM ${ACR_URL}/geoanalytics/r:base AS BUILD
+FROM ${ACR_URL}/geoanalytics/eo-notebook/base:${BASE_VERSION_TAG}
+
+COPY --from=BUILD /usr/local/lib/R/site-library /srv/conda/envs/notebook/lib/R/site-library
+ENV R_HOME=/srv/conda/envs/notebook/lib/R/site-library
+ENV CRAN=https://cloud.r-project.org
+
+COPY dask-lab-ext-config.yaml /home/jovyan/.config/dask/lab-ext.yaml

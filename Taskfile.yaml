@@ -1,0 +1,52 @@
+# https://taskfile.dev
+version: '3'
+
+dotenv:
+  - .env
+
+env:
+  BASE_VERSION_TAG: 0.1.0
+  GA_BASE_IMAGE_TAG: geoanalytics/eo-notebook/base:{{.BASE_VERSION_TAG}}
+
+  R_BASE_IMAGE_TAG: geoanalytics/eo_notebook/extensions/r-base
+
+  R_IMAGE_TAG: 4.2.3
+
+  EO_IMG: geoanalytics/eo-notebook/eo
+  EO_TAG: 0.1.0
+
+  EXPERIMENTAL_TAG: exp_0.1.0
+
+tasks:
+
+  build-base:
+    cmds:
+      - az acr build --registry {{.ACR_NAME}} --image {{.GA_BASE_IMAGE_TAG}} base
+  
+  build-extensions.r:
+    cmds:
+      - az acr build --registry {{.ACR_NAME}} --build-arg R_IMAGE_TAG={{.R_IMAGE_TAG}} --image {{.R_BASE_IMAGE_TAG}} extenensions/r-base
+  
+  build-eo:
+    cmds:
+      - az acr build --registry {{.ACR_NAME}} --build-arg ACR_URL={{.ACR_URL}} --build-arg BASE_VERSION_TAG={{.BASE_VERSION_TAG}} --image {{.EO_IMG}}:{{.EO_TAG}} eo
+
+  build-experimental:
+    cmds:
+      - az acr build --registry {{.ACR_NAME}} --build-arg ACR_URL={{.ACR_URL}} --build-arg BASE_VERSION_TAG={{.BASE_VERSION_TAG}} --image {{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} experimental
+
+  migrate-images:
+    cmds:
+      - az acr import --name {{.DEST_CR}} --source {{.ACR_URL}}/{{.EO_IMG}}:{{.EO_TAG}} --image {{.EO_IMG}}:{{.EO_TAG}} {{.CLI_ARGS}}
+      - az acr import --name {{.DEST_CR}} --source {{.ACR_URL}}/{{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} --image {{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} {{.CLI_ARGS}}
+
+  conda-lock:
+    dir: geoanalytics-base
+    cmds:
+      - conda-lock lock --mamba -k explicit -f environment.yml -p linux-64
+      - echo "conda-lock locked"
+      
+  packages:
+    cmds:
+      - python generate-pkg-file.py geoanalytics-base/conda-linux-64.lock > geoanalytics-base/packages.txt
+      - echo "pip==23.1" >> geoanalytics-base/packages.txt

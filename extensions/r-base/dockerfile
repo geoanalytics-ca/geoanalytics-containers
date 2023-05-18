@@ -1,0 +1,25 @@
+ARG R_IMAGE_TAG=4.2.3
+FROM r-base:${R_IMAGE_TAG} as BUILD
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    dirmngr \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libv8-dev \
+    libgdal-dev \
+    libproj-dev \
+    libudunits2-dev \
+    libgeos-dev \
+    libnetcdf-dev \
+    libhdf5-dev
+
+RUN mkdir /usr/local/R
+ENV CRAN=https://cloud.r-project.org
+
+# Installing R Packages
+COPY r-pkgs.csv /r-pkgs.csv
+COPY install_R_base.R /install_R_base.R
+RUN Rscript /install_R_base.R
+COPY install_R_pkgs.R /install_R_pkgs.R
+RUN Rscript /install_R_pkgs.R
