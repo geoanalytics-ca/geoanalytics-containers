@@ -19,14 +19,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 
 </Details>
 
-<Details><summary>Changed</summary>
+<Details><summary>Change (0)</summary>
 
 </Details>
 
-<Details><summary>Removed</summary>
+<Details><summary>Removed (0)</summary>
 
 </Details>
 
-<Details><summary>Fixed</summary>
+<Details><summary>Fixed (0)</summary>
 
 </Details>
