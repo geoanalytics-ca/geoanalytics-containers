@@ -36,17 +36,19 @@ tasks:
       - az acr build --registry {{.ACR_NAME}} --build-arg ACR_URL={{.ACR_URL}} --build-arg BASE_VERSION_TAG={{.BASE_VERSION_TAG}} --image {{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} experimental
 
   migrate-images:
+    desc: Migrate Images for tenant clusters
     cmds:
       - az acr import --name {{.DEST_CR}} --source {{.ACR_URL}}/{{.EO_IMG}}:{{.EO_TAG}} --image {{.EO_IMG}}:{{.EO_TAG}} {{.CLI_ARGS}}
       - az acr import --name {{.DEST_CR}} --source {{.ACR_URL}}/{{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} --image {{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} {{.CLI_ARGS}}
 
-  conda-lock:
-    dir: geoanalytics-base
+  create-conda-lock:
+    dir: eo
     cmds:
       - conda-lock lock --mamba -k explicit -f environment.yml -p linux-64
       - echo "conda-lock locked"
       
-  packages:
+  create-packages:
+    dir: eo
     cmds:
-      - python generate-pkg-file.py geoanalytics-base/conda-linux-64.lock > geoanalytics-base/packages.txt
-      - echo "pip==23.1" >> geoanalytics-base/packages.txt
+      - python ../generate-pkg-file.py conda-linux-64.lock > packages.txt
+      - echo "pip==23.1" >> packages.txt

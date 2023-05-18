@@ -60,6 +60,18 @@ RUN echo "Installing Apt-get packages..." \
     && apt-get install -y apt-utils wget zip tzdata curl gpg lsb-release > /dev/null \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Install extra tooling &&-
+# Install go-task (Taskfile binary)
+RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/bin
+
+# RClone
+RUN curl https://rclone.org/install.sh | bash
+
+# Fish Shell
+RUN apt update --fix-missing > /dev/null \
+        && apt install -y fish
+# -&&
 # ========================
 # FIXME (?): user and home folder is hardcoded for now
 # FIXME (?): this line breaks the cache of all steps below
@@ -204,3 +216,14 @@ ONBUILD RUN echo "Checking for 'start'..." \
 ONBUILD ENV SHELL=/usr/bin/fish
 EXPOSE 8888
 ENTRYPOINT ["/srv/start"]
+
+ONBUILD RUN mkdir -p ${HOME}/.config/env-context \
+    && mv \
+    *.txt \
+    *Dockerfile* \
+    *dockerfile* \
+    *.yaml \
+    *py \
+    start \
+    *.lock \
+     ${HOME}/.config/env-context/.

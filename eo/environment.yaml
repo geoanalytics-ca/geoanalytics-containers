@@ -57,9 +57,7 @@ dependencies:
  - jupyter-lsp
  - jupyter-panel-proxy
  - jupyter-resource-usage
- - jupyter-rsession-proxy
  - jupyter-server-proxy
- - jupyter-vscode-proxy
  - jupyterhub-base
  - jupyterhub-singleuser
  - jupyterlab
