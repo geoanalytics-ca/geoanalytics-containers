@@ -10,52 +10,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 > **Note**
 > Date Format: dd-mm-yyyy
 
+## [Unreleased] - 18-05-2023
 
-<!-- 
-## [0.2.0] - 02-05-2023
+<Details><summary>Added (2)</summary>
 
-### Added
+- Moved build system to emulate Pangeo's Docker Image build workflow.
+- Started new CHANGELOG to reflect semantic versioning.
 
-- Created Changelog markdown file
+</Details>
 
-### Changed
+<Details><summary>Changed</summary>
 
-- Change and Version tracking of the `geoanalytics-eo` image
+</Details>
 
-## [0.1.4] - 27-03-2023
+<Details><summary>Removed</summary>
 
-### Added
+</Details>
 
-- Added in Extensions:
-    - jupyterlab-system-monitor
-    - jupyterlab_execute_time
-    - jupyter-dash
-    - jupyterlab-geojson
+<Details><summary>Fixed</summary>
 
-### Changed
-
-## [0.1.3] - 24-03-2023
-
-### Added
-
-- Included hera-workflows and argo-workflows in installation setup
-
-### Changed
-
-## [0.1.2] - 23-03-2023
-
-### Added
-
-- Ensured all installations are added to the `notebook` environment
-- Removed SSH kernel (possible future inclusion again)
-- Removed reinstallation of JH ext dask and git
-
-### Changed
-
-## [0.1.1] - 22-03-2023
-
-### Added
-
- - Included SSH and Fortran kernels
- - Explicitly installing bokeh<=2.4.2>3
- - Initial implementation of the `geoanalytics-eo` image -->
+</Details>
