@@ -1,0 +1,89 @@
+ARG ACR_URL=acrname
+ARG BASE_VERSION_TAG
+
+# FROM ${ACR_URL}/geoanalytics/r:base AS BUILD
+FROM ${ACR_URL}/geoanalytics/eo-notebook/base:${BASE_VERSION_TAG}
+
+# COPY --from=BUILD /usr/local/lib/R/site-library /srv/conda/envs/notebook/lib/R/site-library
+# ENV R_HOME=/srv/conda/envs/notebook/lib/R/site-library
+
+# Installing R Packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    software-properties-common \
+    dirmngr \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    libxml2-dev \
+    libv8-dev \
+    libgdal-dev \
+    libproj-dev \
+    libudunits2-dev \
+    libgeos-dev \
+    libnetcdf-dev \
+    libhdf5-dev
+
+RUN apt update && apt install -y \
+        --no-install-recommends \
+        r-base \
+        r-base-dev \
+        r-recommended \
+        r-cran-rgdal \
+        r-cran-rgeos \
+        r-cran-raster \
+        r-cran-sp \
+        r-cran-sf \
+        r-cran-ncdf4 \
+        r-cran-udunits2 \
+        r-cran-xml2 \
+        r-cran-httr \
+        r-cran-rvest \
+        r-cran-rcurl \
+        r-cran-rjson \
+        r-cran-rjsonio \
+        r-cran-rsqlite \
+        r-cran-rmysql \
+        r-cran-rpostgresql \
+        r-cran-rsqlite \
+        r-cran-rhdf5 \
+        r-cran-rhdf5lib \
+        r-cran-rhdf5filters \
+        r-cran-rhdf5client \
+        r-cran-rhdf5dds \
+        r-cran-rhdf5pdc \
+        r-cran-rhdf5plugins 
+
+RUN mkdir -p /usr/local/R
+ENV CRAN=https://cloud.r-project.org
+
+# Installing R Packages
+COPY r-pkgs.csv /r-pkgs.csv
+COPY install_R_base.R /install_R_base.R
+RUN Rscript /install_R_base.R
+COPY install_R_pkgs.R /install_R_pkgs.R
+RUN Rscript /install_R_pkgs.R
+
+# Installing Python Packages
+RUN pip install --upgrade pip
+RUN pip install poetry==1.5.1
+COPY poetry.lock /poetry.lock
+COPY pyproject.toml /pyproject.toml
+RUN poetry config virtualenvs.create false \
+    && poetry install --no-dev --no-interaction --no-ansi
+
+RUN apt update && apt install -y \
+        --no-install-recommends \
+        llvmdev \
+        cmake
+
+USER root
+WORKDIR /
+RUN wget https://lfortran.github.io/tarballs/dev/lfortran-0.9.0.tar.gz \
+    && tar xzf lfortran-0.9.0.tar.gz \
+    && cd lfortran-0.9.0
+
+RUN cmake -DWITH_LLVM=yes -DCMAKE_INSTALL_PREFIX=`pwd`/inst . \
+    && make -j8 \
+    && make install
+
+USER ${NB_USER}
+WORKDIR ${HOME}

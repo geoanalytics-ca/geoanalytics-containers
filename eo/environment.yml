@@ -4,9 +4,6 @@ channels:
  - nodefaults
 dependencies:
  - adlfs
- - argo-workflows
- - argopy
- - awscli
  - black # req for code_formatter ext
  - boto3
  - bottleneck
@@ -15,12 +12,13 @@ dependencies:
  - cfgrib
  - ciso
  - dask
- - distributed
  - dask-gateway
  - dask-ml
  - datashader
  - descartes
- - earthdata
+ - distributed
+ - docker-py
+ - earthaccess
  - eofs
  - erddapy
  - esmpy
@@ -28,7 +26,6 @@ dependencies:
  - flox
  - fsspec
  - gcm_filters
- - gcsfs
  - geocube
  - geopandas
  - geopy
@@ -39,7 +36,7 @@ dependencies:
  - gsw
  - h5netcdf
  - h5py
- - hera-workflows
+ - hera
  - holoviews
  - hvplot
  - intake
@@ -66,7 +63,6 @@ dependencies:
  - jupyterlab_iframe
  - jupyterlab_templates
  - jupyterlab-geojson
- - jupyterlab-geojson
  - jupyterlab-git
  - kerchunk
  - lfortran
@@ -74,13 +70,18 @@ dependencies:
  - lz4
  - matplotlib-base
  - metpy
+ - minio
  - nb_conda_kernels
  - nbstripout
  - nc-time-axis
  - netcdf4
  - numcodecs
  - numpy
+ - odc-algo
+ - odc-cloud[ASYNC]
+ - odc-io
  - odc-stac
+ - odc-stats
  - pandas
  - panel
  - param
@@ -91,16 +92,20 @@ dependencies:
  - pycamhd
  - pydap
  - pygeos
+ - pymannkendall
  - pystac
  - pystac-client
  - python-blosc
  - python-gist
  - python-graphviz
+ - python-lsp-server 
  - r-irkernel
+ - r-languageserver
  - rasterio
  - rechunker
  - rio-cogeo
  - rioxarray
+ - s2cloudless
  - s3fs
  - satpy
  - scikit-image
@@ -109,6 +114,7 @@ dependencies:
  - seaborn
  - snakeviz
  - sparse
+ - spyndex
  - stackstac
  - tiledb-py
  - timezonefinder

@@ -5,7 +5,7 @@ dotenv:
   - .env
 
 env:
-  BASE_VERSION_TAG: 0.1.0
+  BASE_VERSION_TAG: 0.2.0
   GA_BASE_IMAGE_TAG: geoanalytics/eo-notebook/base:{{.BASE_VERSION_TAG}}
 
   R_BASE_IMAGE_TAG: geoanalytics/eo_notebook/extensions/r-base
@@ -13,11 +13,19 @@ env:
   R_IMAGE_TAG: 4.2.3
 
   EO_IMG: geoanalytics/eo-notebook/eo
-  EO_TAG: 0.1.0
 
   EXPERIMENTAL_TAG: exp_0.1.0
 
+vars:
+  EO_TAG: 
+    sh: echo $(date +'%Y-%m-%d')
+
 tasks:
+
+  echo-eo:
+    desc: Echo the EO image tag
+    cmds:
+      - echo {{.EO_TAG}}
 
   build-base:
     cmds:
@@ -38,8 +46,9 @@ tasks:
   migrate-images:
     desc: Migrate Images for tenant clusters
     cmds:
-      - az acr import --name {{.DEST_CR}} --source {{.ACR_URL}}/{{.EO_IMG}}:{{.EO_TAG}} --image {{.EO_IMG}}:{{.EO_TAG}} {{.CLI_ARGS}}
-      - az acr import --name {{.DEST_CR}} --source {{.ACR_URL}}/{{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} --image {{.EO_IMG}}:{{.EXPERIMENTAL_TAG}} {{.CLI_ARGS}}
+      - az acr import --name {{.DEST_CR}} --source {{.ACR_URL}}/{{.EO_IMG}}:$TGT_TAG --image {{.EO_IMG}}:$TGT_TAG {{.CLI_ARGS}}
+    env:
+      TGT_TAG: 2023-08-20
 
   create-conda-lock:
     dir: eo

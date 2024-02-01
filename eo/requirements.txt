@@ -1,4 +1,2 @@
-jupyterlab-s3-browser>=0.12
-git+https://github.com/couler-proj/couler
-hera==5.1.0
-bokeh>=2.4.2,<3
+# jupyterlab-s3-browser>=0.12
+# git+https://github.com/couler-proj/couler
