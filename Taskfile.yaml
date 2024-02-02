@@ -5,7 +5,7 @@ dotenv:
   - .env
 
 env:
-  BASE_VERSION_TAG: 0.2.0
+  BASE_VERSION_TAG: 0.3.0
   GA_BASE_IMAGE_TAG: geoanalytics/eo-notebook/base:{{.BASE_VERSION_TAG}}
 
   R_BASE_IMAGE_TAG: geoanalytics/eo_notebook/extensions/r-base

@@ -6,46 +6,37 @@ dependencies:
  - adlfs
  - argopy
  - awscli
- - black 
+ - black
  - boto3
  - bottleneck
- - bqplot
  - cartopy
  - cdsapi
- - cf_xarray
  - cfgrib
+ - cf_xarray
  - ciso
  - cmocean
- - dask
- - dask-gateway
  - dask-ml
  - datashader
  - descartes
- - distributed
- - docker-py
  - earthaccess
  - eofs
  - erddapy
  - esmpy
  - fastjmd95
- - flake8
- - flake8-black
- - flake8-nb
  - flox
  - fsspec
  - gcm_filters
+ - gcsfs
+ - gh
+ - gh-scoped-creds
  - geocube
  - geopandas
  - geopy
  - geoviews-core
- - gh
- - gh-scoped-creds
  - git-lfs
- - glab
  - gsw
  - h5netcdf
  - h5py
- - hera
  - holoviews
  - hvplot
  - intake
@@ -56,34 +47,20 @@ dependencies:
  - ipdb
  - ipykernel
  - ipyleaflet
- - ipympl
  - ipytree
  - ipywidgets
- - isort # req for code_formatter ext
- - jupyter-ai
- - jupyter-lsp
- - jupyter-panel-proxy
- - jupyter-resource-usage
- - jupyter-server-proxy
- - jupyterhub-base
- - jupyterhub-singleuser
- - jupyterlab
  - jupyterlab_code_formatter
- - jupyterlab_execute_time
- - jupyterlab_iframe
- - jupyterlab_templates
- - jupyterlab-geojson
  - jupyterlab-git
  - jupyterlab-myst
+ - jupyter-panel-proxy
+ - jupyter-resource-usage
  - kerchunk
- - lfortran
  - line_profiler
  - lxml
  - lz4
  - matplotlib-base
  - memory_profiler
  - metpy
- - minio
  - nb_conda_kernels
  - nbstripout
  - nc-time-axis
@@ -92,55 +69,42 @@ dependencies:
  - numcodecs
  - numpy
  - numpy_groupies
- - odc-algo
- - odc-cloud[ASYNC]
- - odc-io
  - odc-stac
- - odc-stats
  - pandas
  - panel
- - param
  - parcels
- - parquet-tools
- - planetary-computer
+ - param
  - pop-tools
  - pyarrow
  - pycamhd
  - pydap
- - pygeos
- - pymannkendall
  - pystac
  - pystac-client
  - python-blosc
  - python-gist
  - python-graphviz
- - python-lsp-server 
  - python-xxhash
- - r-irkernel
- - r-languageserver
  - rasterio
  - rechunker
  - rio-cogeo
  - rioxarray
- - s2cloudless
  - s3fs
  - satpy
  - scikit-image
  - scikit-learn
  - scipy
  - seaborn
- - snakeviz
  - sparse
- - spyndex
+ - snakeviz
  - stackstac
  - tiledb-py
  - timezonefinder
  - watermark
  - xarray
- - xarray_leaflet
- - xarray-datatree
- - xarray-spatial
  - xarrayutils
+ - xarray-datatree
+ - xarray_leaflet
+ - xarray-spatial
  - xbatcher
  - xcape
  - xclim
