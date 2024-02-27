@@ -2,3 +2,4 @@ pangeo-env.yaml
 conda-lock.yaml
 conda-linux-64.lock
 pangeo-dockerfile
+pcakages.txt

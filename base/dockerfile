@@ -4,7 +4,6 @@ FROM ubuntu:23.04
 
 SHELL ["/bin/bash", "-c"]
 
-
 LABEL org.opencontainers.image.source=https://github.com/pangeo-data/pangeo-docker-images
 LABEL org.opencontainers.image.authors="Pangeo Developers"
 LABEL maintainer.editor="bnjam <Benjamin Smith>"
@@ -23,9 +22,9 @@ ENV CONDA_ENV=notebook \
     LANG=C.UTF-8  \
     LC_ALL=C.UTF-8 \
     # Install conda in the same place repo2docker does
-    CONDA_DIR=/srv/conda \
+    CONDA_DIR=/srv/conda
     # Timezone set to PST
-    TZ=America/Los_Angeles
+#     TZ=America/Los_Angeles
 
 # All env vars that reference other env vars need to be in their own ENV block
 # Path to the python environment where the jupyter notebook packages are installed
@@ -47,20 +46,29 @@ ENV DASK_ROOT_CONFIG=${CONDA_DIR}/etc
 # Install basic apt packages
 RUN echo "Installing Apt-get packages..." \
     && apt-get update --fix-missing > /dev/null \
-    && apt-get install -y apt-utils software-properties-common build-essential > /dev/null
+    && apt-get install -y apt-utils > /dev/null
 
 RUN apt-get install -y --fix-missing \
+        software-properties-common \
+        build-essential \
         wget \
         zip \
         tzdata \
         curl \
         gpg \
+        git \
+        groff \
+        tree \
+        htop \
+        nano \
+        vim \
+        openssl \
         lsb-release \
         > /dev/null
 
-RUN echo "Setting timezone to ${TZ}..." \
-    && ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
-    && echo ${TZ} > /etc/timezone
+# RUN echo "Setting timezone to ${TZ}..." \
+#     && ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
+#     && echo ${TZ} > /etc/timezone
 
 RUN apt-get update --fix-missing > /dev/null \        
     && apt-get clean \
@@ -73,12 +81,6 @@ RUN echo "Creating ${NB_USER} user..." \
         && useradd --create-home --gid ${NB_UID} --no-log-init --uid ${NB_UID} ${NB_USER} \
         # Make sure that /srv is owned by non-root user, so we can install things there
         && chown -R ${NB_USER}:${NB_USER} /srv
-
-# Install Python 3.11
-RUN apt-get update --fix-missing > /dev/null \
-        && apt-get install -y python3.11 python3.11-distutils python3.11-dev > /dev/null \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*
 
 # Run conda activate each time a bash shell starts, so users don't have to manually type conda activate
 # Note this is only read by shell, but not by the jupyter notebook - that relies
@@ -101,16 +103,16 @@ RUN apt update --fix-missing > /dev/null \
 # FIXME (?): user and home folder is hardcoded for now
 # FIXME (?): this line breaks the cache of all steps below
 ONBUILD USER root
-ONBUILD COPY --chown=jovyan:jovyan . /home/jovyan
-ARG ENV_CONTEXT_DIR=/home/jovyan/.session-context/
+ONBUILD COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
+ARG ENV_CONTEXT_DIR=/home/${NB_USER}/.session-context/
 RUN mkdir -p ${ENV_CONTEXT_DIR}; chown -R ${NB_USER} ${ENV_CONTEXT_DIR}
 ONBUILD COPY . ${ENV_CONTEXT_DIR}/
 # Docker
-ONBUILD RUN mkdir -p /etc/apt/keyrings
-ONBUILD RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-ONBUILD RUN echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+# ONBUILD RUN mkdir -p /etc/apt/keyrings
+# ONBUILD RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+# ONBUILD RUN echo \
+#   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+#   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Install apt packages specified in a apt.txt file if it exists.
 # Unlike repo2docker, blank lines nor comments are supported here.
@@ -185,16 +187,12 @@ ONBUILD USER ${NB_USER}
 # a list of base packages.
 # After installing the packages, we cleanup some unnecessary files
 # to try reduce image size - see https://jcristharif.com/conda-docker-tips.html
-ONBUILD RUN echo "Checking for 'conda-lock.yml' 'conda-linux-64.lock' or 'environment.yml'..." \
+ONBUILD RUN echo "Checking for 'environment.yml'..." \
         ; cd ${ENV_CONTEXT_DIR} \
-        ; if test -f "conda-lock.yml" ; then \
-        conda-lock install --yes --name ${CONDA_ENV} conda-lock.yml \
-        ; elif test -f "conda-linux-64.lock" ; then \
-        mamba create --name ${CONDA_ENV} --file conda-linux-64.lock \
-        ; elif test -f "environment.yml" ; then \
+        ; if test -f "environment.yml" ; then \
         mamba env create --name ${CONDA_ENV} -f environment.yml  \
-        ; else echo "No conda-lock.yml, conda-linux-64.lock, or environment.yml! *creating default env*" ; \
-        mamba create --yes --name ${CONDA_ENV} pangeo-notebook \
+        ; else echo "No environment.yml! *creating default env*" ; \
+        mamba create --yes --name ${CONDA_ENV} \
         ; fi \
         && mamba clean -yaf \
         && find ${CONDA_DIR} -follow -type f -name '*.a' -delete \
@@ -250,5 +248,4 @@ ONBUILD RUN mkdir -p ${HOME}/.config/env-context \
     *.yaml \
     *py \
     start \
-#     *.lock \
      ${HOME}/.config/env-context/.

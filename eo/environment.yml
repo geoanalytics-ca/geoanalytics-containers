@@ -1,8 +1,9 @@
-name: pangeo
+name: notebook
 channels:
  - conda-forge
  - nodefaults
 dependencies:
+ - python=3.11
  - adlfs
  - argopy
  - awscli
