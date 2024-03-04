@@ -1,34 +1,40 @@
-name: pangeo
+name: notebook
 channels:
  - conda-forge
  - nodefaults
 dependencies:
+ - python=3.11
  - adlfs
- - argo-workflows
  - argopy
  - awscli
- - black # req for code_formatter ext
+ - black 
  - boto3
  - bottleneck
  - bqplot
  - cartopy
+ - cdsapi
+ - cf_xarray
  - cfgrib
  - ciso
+ - cmocean
  - dask
- - distributed
  - dask-gateway
  - dask-ml
  - datashader
  - descartes
- - earthdata
+ - distributed
+ - docker-py
+ - earthaccess
  - eofs
  - erddapy
  - esmpy
  - fastjmd95
+ - flake8
+ - flake8-black
+ - flake8-nb
  - flox
  - fsspec
  - gcm_filters
- - gcsfs
  - geocube
  - geopandas
  - geopy
@@ -36,10 +42,11 @@ dependencies:
  - gh
  - gh-scoped-creds
  - git-lfs
+ - glab
  - gsw
  - h5netcdf
  - h5py
- - hera-workflows
+ - hera
  - holoviews
  - hvplot
  - intake
@@ -47,13 +54,14 @@ dependencies:
  - intake-geopandas
  - intake-stac
  - intake-xarray
- - ipykernel>=6.21.2
- - ipyleaflet
+ - ipdb
+ - ipykernel
  - ipyleaflet
  - ipympl
  - ipytree
  - ipywidgets
  - isort # req for code_formatter ext
+ - jupyter-ai
  - jupyter-lsp
  - jupyter-panel-proxy
  - jupyter-resource-usage
@@ -66,41 +74,56 @@ dependencies:
  - jupyterlab_iframe
  - jupyterlab_templates
  - jupyterlab-geojson
- - jupyterlab-geojson
  - jupyterlab-git
+ - jupyterlab-myst
  - kerchunk
  - lfortran
+ - line_profiler
  - lxml
  - lz4
  - matplotlib-base
+ - memory_profiler
  - metpy
+ - minio
  - nb_conda_kernels
  - nbstripout
  - nc-time-axis
  - netcdf4
+ - numbagg
  - numcodecs
  - numpy
+ - numpy_groupies
+ - odc-algo
+ - odc-cloud[ASYNC]
+ - odc-io
  - odc-stac
+ - odc-stats
  - pandas
  - panel
  - param
  - parcels
+ - parquet-tools
  - planetary-computer
  - pop-tools
  - pyarrow
  - pycamhd
  - pydap
  - pygeos
+ - pymannkendall
  - pystac
  - pystac-client
  - python-blosc
  - python-gist
  - python-graphviz
+ - python-lsp-server 
+ - python-xxhash
  - r-irkernel
+ - r-languageserver
  - rasterio
  - rechunker
  - rio-cogeo
  - rioxarray
+ - s2cloudless
  - s3fs
  - satpy
  - scikit-image
@@ -109,9 +132,11 @@ dependencies:
  - seaborn
  - snakeviz
  - sparse
+ - spyndex
  - stackstac
  - tiledb-py
  - timezonefinder
+ - watermark
  - xarray
  - xarray_leaflet
  - xarray-datatree
@@ -121,6 +146,7 @@ dependencies:
  - xcape
  - xclim
  - xesmf
+ - xgboost
  - xgcm
  - xhistogram
  - xmip
@@ -128,7 +154,5 @@ dependencies:
  - xpublish
  - xrft
  - xskillscore
+ - xxhash
  - zarr
- # - geogif
- # - xcube>=0.9.1
-# - rise

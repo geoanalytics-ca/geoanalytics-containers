@@ -10,6 +10,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 
 > **Note**
 > Date Format: dd-mm-yyyy
 
+## [EO 0.1.1] - 18-08-2023
+
+<Details><summary>Added (0)</summary>
+
+</Details>
+
+<Details><summary>Change (3)</summary>
+
+- Push Base Image to 0.2.0 -> rebuild with updated packages
+- hera-workflows to hera -> reflect naming update for >5.0.0
+- Upgrade hera from 5.1.0 -> 5.6.0
+
+</Details>
+
+<Details><summary>Removed (0)</summary>
+
+</Details>
+
+<Details><summary>Fixed (0)</summary>
+
+</Details>
+
+
 ## [Unreleased] - 18-05-2023
 
 <Details><summary>Added (2)</summary>

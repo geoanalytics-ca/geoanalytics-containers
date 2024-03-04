@@ -4,8 +4,9 @@ FROM ubuntu:23.04
 
 SHELL ["/bin/bash", "-c"]
 
-
 LABEL org.opencontainers.image.source=https://github.com/pangeo-data/pangeo-docker-images
+LABEL org.opencontainers.image.authors="Pangeo Developers"
+LABEL maintainer.editor="bnjam <Benjamin Smith>"
 
 # Setup environment to match variables set by repo2docker as much as possible
 # The name of the conda environment into which the requested packages are installed
@@ -22,12 +23,14 @@ ENV CONDA_ENV=notebook \
     LC_ALL=C.UTF-8 \
     # Install conda in the same place repo2docker does
     CONDA_DIR=/srv/conda
+    # Timezone set to PST
+#     TZ=America/Los_Angeles
 
 # All env vars that reference other env vars need to be in their own ENV block
 # Path to the python environment where the jupyter notebook packages are installed
-ENV NB_PYTHON_PREFIX=${CONDA_DIR}/envs/${CONDA_ENV} \
-    # Home directory of our non-root user
-    HOME=/home/${NB_USER}
+ENV NB_PYTHON_PREFIX=${CONDA_DIR}/envs/${CONDA_ENV}
+# Home directory of our non-root user
+ENV HOME=/home/${NB_USER}
 
 # Add both our notebook env as well as default conda installation to $PATH
 # Thus, when we start a `python` process (for kernels, or notebooks, etc),
@@ -39,6 +42,37 @@ ENV PATH=${NB_PYTHON_PREFIX}/bin:${CONDA_DIR}/bin:${PATH}
 # the default of /etc, since the non-root jovyan user can write
 # to ${CONDA_DIR}/etc but not to /etc
 ENV DASK_ROOT_CONFIG=${CONDA_DIR}/etc
+
+# Install basic apt packages
+RUN echo "Installing Apt-get packages..." \
+    && apt-get update --fix-missing > /dev/null \
+    && apt-get install -y apt-utils > /dev/null
+
+RUN apt-get install -y --fix-missing \
+        software-properties-common \
+        build-essential \
+        wget \
+        zip \
+        tzdata \
+        curl \
+        gpg \
+        git \
+        groff \
+        tree \
+        htop \
+        nano \
+        vim \
+        openssl \
+        lsb-release \
+        > /dev/null
+
+# RUN echo "Setting timezone to ${TZ}..." \
+#     && ln -snf /usr/share/zoneinfo/${TZ} /etc/localtime \
+#     && echo ${TZ} > /etc/timezone
+
+RUN apt-get update --fix-missing > /dev/null \        
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN echo "Creating ${NB_USER} user..." \
         # Create a group for the user to be part of, with gid same as uid
@@ -53,13 +87,6 @@ RUN echo "Creating ${NB_USER} user..." \
 # on us starting the correct `python` process, which we do by adding the notebook conda environment's
 # bin to PATH earlier ($NB_PYTHON_PREFIX/bin)
 RUN echo ". ${CONDA_DIR}/etc/profile.d/conda.sh ; conda activate ${CONDA_ENV}" > /etc/profile.d/init_conda.sh
-
-# Install basic apt packages
-RUN echo "Installing Apt-get packages..." \
-    && apt-get update --fix-missing > /dev/null \
-    && apt-get install -y apt-utils wget zip tzdata curl gpg lsb-release > /dev/null \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
 # Install extra tooling &&-
 # Install go-task (Taskfile binary)
@@ -76,16 +103,16 @@ RUN apt update --fix-missing > /dev/null \
 # FIXME (?): user and home folder is hardcoded for now
 # FIXME (?): this line breaks the cache of all steps below
 ONBUILD USER root
-ONBUILD COPY --chown=jovyan:jovyan . /home/jovyan
-ARG ENV_CONTEXT_DIR=/home/jovyan/.session-context/
+ONBUILD COPY --chown=${NB_USER}:${NB_USER} . /home/${NB_USER}
+ARG ENV_CONTEXT_DIR=/home/${NB_USER}/.session-context/
 RUN mkdir -p ${ENV_CONTEXT_DIR}; chown -R ${NB_USER} ${ENV_CONTEXT_DIR}
 ONBUILD COPY . ${ENV_CONTEXT_DIR}/
 # Docker
-ONBUILD RUN mkdir -p /etc/apt/keyrings
-ONBUILD RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-ONBUILD RUN echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+# ONBUILD RUN mkdir -p /etc/apt/keyrings
+# ONBUILD RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+# ONBUILD RUN echo \
+#   "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+#   $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
 
 # Install apt packages specified in a apt.txt file if it exists.
 # Unlike repo2docker, blank lines nor comments are supported here.
@@ -160,16 +187,12 @@ ONBUILD USER ${NB_USER}
 # a list of base packages.
 # After installing the packages, we cleanup some unnecessary files
 # to try reduce image size - see https://jcristharif.com/conda-docker-tips.html
-ONBUILD RUN echo "Checking for 'conda-lock.yml' 'conda-linux-64.lock' or 'environment.yml'..." \
+ONBUILD RUN echo "Checking for 'environment.yml'..." \
         ; cd ${ENV_CONTEXT_DIR} \
-        ; if test -f "conda-lock.yml" ; then \
-        conda-lock install --yes --name ${CONDA_ENV} conda-lock.yml \
-        ; elif test -f "conda-linux-64.lock" ; then \
-        mamba create --name ${CONDA_ENV} --file conda-linux-64.lock \
-        ; elif test -f "environment.yml" ; then \
+        ; if test -f "environment.yml" ; then \
         mamba env create --name ${CONDA_ENV} -f environment.yml  \
-        ; else echo "No conda-lock.yml, conda-linux-64.lock, or environment.yml! *creating default env*" ; \
-        mamba create --yes --name ${CONDA_ENV} pangeo-notebook \
+        ; else echo "No environment.yml! *creating default env*" ; \
+        mamba create --yes --name ${CONDA_ENV} \
         ; fi \
         && mamba clean -yaf \
         && find ${CONDA_DIR} -follow -type f -name '*.a' -delete \
@@ -182,7 +205,7 @@ ONBUILD RUN echo "Checking for 'conda-lock.yml' 'conda-linux-64.lock' or 'enviro
 # If a requirements.txt file exists, use pip to install packages
 # listed there. We don't want to save cached wheels in the image
 ONBUILD RUN echo "Checking for pip 'requirements.txt'..." \
-        ; cd ${ENV_CONTEXT_DIR}} \
+        ; cd ${ENV_CONTEXT_DIR} \
         ; if test -f "requirements.txt" ; then \
         ${NB_PYTHON_PREFIX}/bin/pip install --no-cache -r requirements.txt \
         ; fi
@@ -225,5 +248,4 @@ ONBUILD RUN mkdir -p ${HOME}/.config/env-context \
     *.yaml \
     *py \
     start \
-    *.lock \
      ${HOME}/.config/env-context/.

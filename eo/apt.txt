@@ -1,12 +1,1 @@
-git
-groff
-tree
-wget
-htop
-nano
-vim
-openssl
-docker-ce
-docker-ce-cli
-docker-compose-plugin
 lftp
